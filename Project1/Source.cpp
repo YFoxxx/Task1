@@ -1,40 +1,65 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <vector>
+#include <stdlib.h>
 using namespace std;
 
 
 int main()
 {
     setlocale(LC_ALL, "Russian");
-    int num1, price1, num2, price2, earnings=0;
-    cout << "Введите количество продавцов ";
-    cin >> num1; // получение от пользователя размера массива
-    int* sellers = new int[num1]; // Выделение памяти для массива
-    for (int i = 0; i < num1; i++) {
-        // Заполнение массива и вывод значений его элементов
-        cout << "Введите цену " << i+1 << " продавца"<< endl;
-        cin >> price1;
-        sellers[i] = price1;
-        cout << "Цена " << i+1 << " продавца - " << sellers[i] << endl;
-    }
-    
-    cout << "Введите количество покупателей ";
-    cin >> num2; // получение от пользователя размера массива
+    int price1, num2, num1, price2, earnings=0;
+    vector<int> sellers;
+    vector<int> customer;
+    vector<string> file;
+    string line;
+    ofstream fout;
+    ifstream fin;
+    int ch = 0;
 
-    int* customer = new int[num2]; // Выделение памяти для массива
-    for (int i = 0; i < num2; i++) {
-        // Заполнение массива и вывод значений его элементов
-        cout << "Введите цену, за которую  " << i + 1 << " покупатель готов купить арбуз" << endl;
-        cin >> price2;
-        customer[i] = price2;
-        cout << "Цена  " << i + 1 << " покупателя - " << customer[i] << endl;
+
+    fin.open("INPUT.txt");
+    if (fin.is_open()) {
+        while ((ch = fin.get()) != EOF) {
+            if (char(ch) != '\n') line = line + char(ch);
+            else {
+                file.push_back(line);
+                line.clear();
+            }
+        }
+        file.push_back(line);
+        fin.close();
     }
+    else {
+        cout << "Error!";
+    }
+
+
+    num1 = file[0][0]-'0';
+    num2 = file[0][2]-'0';
+
+
+    for (int i = 0; i < num1*2; i++) {
+        price1 = file[1][i] - '0';
+        i += 1;
+        sellers.push_back(price1);
+    }
+
+    for (int i = 0; i < num2*2; i++) {
+        price2 = file[2][i] - '0';
+        i += 1;
+        customer.push_back(price2);
+    }
+
+
     for (int k = 0; k < num1; k++) {
         for (int l = 0; l < num2; l++) {
             if (sellers[k] <= customer[l]) {
                 //cout << customer[l]<< endl;
                 earnings += customer[l];
                 k += 1;
+                if (k >= num1) break;
 
             }
             
@@ -48,8 +73,15 @@ int main()
             globprice = customer[i];
         }
     }
-    cout << globprice<< " "<< earnings;
-    delete[] sellers; // очистка памяти
-    delete[] customer; // очистка памяти
+    //cout << globprice<< " "<< earnings;
+    
+
+
+    fout.open("OUTPUT.txt");
+    fout << globprice << " " << earnings;
+    fout.close();
+
+    sellers.clear();
+    customer.clear(); 
 }
 
